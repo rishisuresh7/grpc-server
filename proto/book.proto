@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "grpc-server/proto";
+
+message Book {
+  string id = 1;
+  string name = 2;
+  string author = 3;
+}
+
+service BookService {
+  rpc Create(Book) returns (Book);
+  rpc Update(Book) returns (Book);
+  rpc Delete(Book) returns (Book);
+  rpc Get(Book) returns (Book);
+}
