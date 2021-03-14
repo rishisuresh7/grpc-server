@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 
+	grpcLogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/sirupsen/logrus"
 	formatter "github.com/x-cray/logrus-prefixed-formatter"
 	"google.golang.org/grpc"
@@ -12,6 +13,7 @@ import (
 
 	"grpc-server/config"
 	"grpc-server/factory"
+	"grpc-server/interceptor"
 	"grpc-server/proto"
 	"grpc-server/wrapper"
 )
@@ -40,7 +42,10 @@ func main() {
 	}
 
 	f := factory.NewFactory(conf, logger)
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.ChainUnaryInterceptor(
+		grpcLogrus.UnaryServerInterceptor(logrus.NewEntry(logger)),
+		interceptor.NewInterceptor(conf.Token),
+	))
 	proto.RegisterBookServiceServer(grpcServer, f.NewBook())
 	reflection.Register(grpcServer)
 	logger.Infof("Running server on :%d", conf.Port)
