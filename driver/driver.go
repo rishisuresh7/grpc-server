@@ -15,6 +15,7 @@ const (
 	collection = "books"
 )
 
+// MongoDriver interface to wrap mongodb methods
 type MongoDriver interface {
 	FindOne(c context.Context, query bson.M, opts *options.FindOneOptions) (*mongo.SingleResult, error)
 	DeleteOne(c context.Context, query bson.M, opts *options.FindOneAndDeleteOptions) (*mongo.SingleResult, error)
@@ -22,14 +23,17 @@ type MongoDriver interface {
 	UpdateOne(ctx context.Context, filter bson.M, query bson.D, opts *options.FindOneAndUpdateOptions) (*mongo.SingleResult, error)
 }
 
+// mongoDriver implements MongoDriver
 type mongoDriver struct {
 	client *mongo.Client
 }
 
+// NewMongoDriver constructor to initialize MongoDriver
 func NewMongoDriver(c *mongo.Client) MongoDriver {
 	return &mongoDriver{client: c}
 }
 
+// FindOne wrapper for mongodb method FindOne
 func (m *mongoDriver) FindOne(ctx context.Context, query bson.M, opts *options.FindOneOptions) (*mongo.SingleResult, error) {
 	coll := m.client.Database(database).Collection(collection)
 	res := coll.FindOne(ctx, query, opts)
@@ -41,6 +45,7 @@ func (m *mongoDriver) FindOne(ctx context.Context, query bson.M, opts *options.F
 	return res, nil
 }
 
+// DeleteOne wrapper for mongodb method FindOneAndDelete
 func (m *mongoDriver) DeleteOne(ctx context.Context, query bson.M, opts *options.FindOneAndDeleteOptions) (*mongo.SingleResult, error) {
 	coll := m.client.Database(database).Collection(collection)
 	res := coll.FindOneAndDelete(ctx, query, opts)
@@ -51,6 +56,7 @@ func (m *mongoDriver) DeleteOne(ctx context.Context, query bson.M, opts *options
 	return res, nil
 }
 
+// InsertOne wrapper for mongodb method InsertOne
 func (m *mongoDriver) InsertOne(ctx context.Context, query bson.M, opts *options.InsertOneOptions) (primitive.ObjectID, error) {
 	coll := m.client.Database(database).Collection(collection)
 	res, err := coll.InsertOne(ctx, query, opts)
@@ -61,6 +67,7 @@ func (m *mongoDriver) InsertOne(ctx context.Context, query bson.M, opts *options
 	return res.InsertedID.(primitive.ObjectID), nil
 }
 
+// UpdateOne wrapper for mongodb method FindOneAndUpdate
 func (m *mongoDriver) UpdateOne(ctx context.Context, filter bson.M, query bson.D, opts *options.FindOneAndUpdateOptions) (*mongo.SingleResult, error) {
 	coll := m.client.Database(database).Collection(collection)
 	res := coll.FindOneAndUpdate(ctx, filter, query, opts)

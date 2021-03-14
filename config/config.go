@@ -8,6 +8,7 @@ import (
 	"grpc-server/wrapper"
 )
 
+// AppConfig config for application
 type AppConfig struct {
 	Port     int
 	MongoUri string
@@ -15,6 +16,7 @@ type AppConfig struct {
 	LogFile  *os.File
 }
 
+// NewConfig constructor for new config initialization
 func NewConfig(w wrapper.Wrapper) (*AppConfig, error) {
 	var missing []string
 	portString := os.Getenv("PORT")

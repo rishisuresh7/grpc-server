@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// NewInterceptor intercepts all requests and validates the authentication token
 func NewInterceptor(secret string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		md, _ := metadata.FromIncomingContext(ctx)

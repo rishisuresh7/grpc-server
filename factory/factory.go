@@ -16,11 +16,13 @@ import (
 	"grpc-server/query"
 )
 
+// Factory interface for object creation
 type Factory interface {
 	NewBook() proto.BookServiceServer
 	NewMongoDriver() driver.MongoDriver
 }
 
+// factory implements Factory
 type factory struct {
 	config *config.AppConfig
 	client *mongo.Client
@@ -29,14 +31,17 @@ type factory struct {
 
 var once sync.Once
 
+// NewFactory constructor to initialize factory
 func NewFactory(c *config.AppConfig, l *logrus.Logger) Factory {
 	return &factory{logger: l, config: c}
 }
 
+// NewBook object of proto.BookServiceServer interface
 func (f *factory) NewBook() proto.BookServiceServer {
 	return book.NewBook(f.NewMongoDriver(), query.NewBookQuery())
 }
 
+// newMongoClient internal method to create mongodb connection
 func (f *factory) newMongoClient() (*mongo.Client, error) {
 	var err error
 	once.Do(func() {
@@ -50,6 +55,7 @@ func (f *factory) newMongoClient() (*mongo.Client, error) {
 	return f.client, nil
 }
 
+// NewMongoDriver creates an object of mongodb driver
 func (f *factory) NewMongoDriver() driver.MongoDriver {
 	client, err := f.newMongoClient()
 	if err != nil {
